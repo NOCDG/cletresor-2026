@@ -1,0 +1,77 @@
+<title>Les 12 Clés</title>
+<style>
+:root{
+  --bg:#070a08; --panel:#0c120d; --border:#1c3324;
+  --fg:#3ce66e; --fg-dim:#5c8f6c; --danger:#ff4d4d;
+  --font-mono:'Space Mono', ui-monospace, 'Courier New', monospace;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-mono);min-height:100vh;margin:0;display:flex;align-items:center;justify-content:center;padding:32px 16px}
+.scanlines{position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(60,230,110,0.035) 0px,rgba(60,230,110,0.035) 1px,transparent 1px,transparent 3px);z-index:5}
+.card{position:relative;z-index:1;width:100%;max-width:460px;background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:28px 24px;box-shadow:0 0 40px rgba(60,230,110,0.06)}
+.badge{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.12em;color:var(--fg-dim);border:1px solid var(--border);border-radius:999px;padding:4px 12px;margin-bottom:20px}
+.badge .dot{width:6px;height:6px;border-radius:50%;background:var(--fg);box-shadow:0 0 8px var(--fg);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+h1{font-size:15px;font-weight:700;letter-spacing:.08em;color:var(--fg-dim);margin:0 0 18px;text-transform:uppercase}
+.riddle{font-size:16px;line-height:1.55;color:var(--fg);margin-bottom:22px}
+.riddle b{color:#7dffa8}
+.prompt-row{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:4px;padding:10px 12px;background:#050805;transition:border-color .15s,transform .15s}
+.prompt-row.shake{animation:shake .35s;border-color:var(--danger)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.prompt-row span{color:var(--fg-dim)}
+#answer{flex:1;min-width:0;background:transparent;border:none;outline:none;color:var(--fg);font-family:var(--font-mono);font-size:16px;caret-color:var(--fg)}
+#answer::placeholder{color:#2c4a35}
+button{font-family:var(--font-mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase;background:var(--fg);color:#04150a;border:none;border-radius:4px;padding:11px 16px;margin-top:14px;width:100%;cursor:pointer;font-weight:700}
+.msg{margin-top:12px;font-size:13px;min-height:18px}
+.msg.err{color:var(--danger)}
+.reveal{margin-top:18px;border:1px solid var(--fg);border-radius:4px;padding:16px;background:rgba(60,230,110,.06)}
+.reveal .ok{font-size:12px;letter-spacing:.1em;color:var(--fg);margin-bottom:10px;text-transform:uppercase}
+.reveal .row{display:flex;gap:10px;font-size:14px;margin-bottom:6px}
+.reveal .row span:first-child{color:var(--fg-dim);min-width:70px}
+.reveal .frag{font-size:17px;font-weight:700;color:#eafff0}
+.hidden{display:none}
+.menu{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
+.menu a{display:block;text-align:center;padding:10px 0;border:1px solid var(--border);border-radius:4px;color:var(--fg-dim);text-decoration:none;font-size:13px}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap">
+<div class="scanlines"></div>
+<div class="card">
+  <div class="badge"><span class="dot"></span><span>TERMINAL — CARTE 11</span></div>
+  <h1>Carte 11</h1>
+  <div class="riddle" id="riddleText">Associe chaque lettre du mot <b>ORDINATEUR</b> à sa position dans l'alphabet, additionne uniquement les chiffres pairs. Total ?</div>
+  <div class="prompt-row" id="promptRow">
+    <span>&gt;</span>
+    <input id="answer" type="text" placeholder="ta réponse" autocomplete="off" />
+  </div>
+  <button id="submitBtn">Valider</button>
+  <div class="msg" id="msg"></div>
+  <div class="reveal hidden" id="revealBox">
+    <div class="ok">Accès accordé</div>
+    <div class="row"><span>Position</span><b>4</b></div>
+    <div class="row"><span>Morceau</span></div>
+    <div class="frag">QUE PERSONNE</div>
+  </div>
+</div>
+<script>
+(function(){
+  var ANSWER = "74";
+  var promptRow=document.getElementById('promptRow'), answerInput=document.getElementById('answer'),
+      submitBtn=document.getElementById('submitBtn'), msg=document.getElementById('msg'),
+      revealBox=document.getElementById('revealBox'), KEY='carte_11_ok';
+  function normalize(s){return (s||'').toString().trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ');}
+  function safeGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+  function safeSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+  function reveal(){revealBox.classList.remove('hidden');promptRow.classList.add('hidden');submitBtn.classList.add('hidden');msg.textContent='';}
+  if (safeGet(KEY)==='1'){reveal();} else {setTimeout(function(){answerInput.focus();},50);}
+  function submit(){
+    var val=normalize(answerInput.value);
+    if(val.length===0)return;
+    if(val===normalize(ANSWER)){safeSet(KEY,'1');reveal();}
+    else{msg.textContent='Ce n\u2019est pas \u00e7a. R\u00e9essaie.';msg.classList.add('err');promptRow.classList.remove('shake');void promptRow.offsetWidth;promptRow.classList.add('shake');answerInput.select();}
+  }
+  submitBtn.addEventListener('click',submit);
+  answerInput.addEventListener('keydown',function(e){if(e.key==='Enter')submit();});
+})();
+</script>
